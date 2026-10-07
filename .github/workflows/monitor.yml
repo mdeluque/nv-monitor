@@ -1,0 +1,49 @@
+# Workflow del repo público del monitor externo (va en .github/workflows/monitor.yml).
+# Repo público: los minutos de Actions son gratis e ilimitados; el token de Telegram va en Secrets.
+name: monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+    - cron: '0 6 1 * *'   # keepalive: GitHub desactiva los cron tras 60 días sin actividad en el repo
+  workflow_dispatch:
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    if: github.event.schedule != '0 6 1 * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: state.json
+          key: monitor-state-${{ github.run_id }}
+          restore-keys: monitor-state-
+      - run: python3 external.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: state.json
+          key: monitor-state-${{ github.run_id }}
+
+  keepalive:
+    if: github.event.schedule == '0 6 1 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name monitor-bot
+          git config user.email monitor-bot@users.noreply.github.com
+          git commit --allow-empty -m "keepalive $(date +%F)"
+          git push
