@@ -19,8 +19,10 @@ SITES = [
     ('PulseTicket API', 'https://api.pulseticket.es/up', None),
     ('PulseTicket admin', 'https://admin.pulseticket.es/', 'PulseTicket'),
     ('PulseTicket tienda', 'https://hinojosa.pulseticket.es/tienda/', 'PulseTicket'),
+    ('MesaLista API', 'https://backend-restaurant.pchinojosa.com/up', None),
+    ('MesaLista web', 'https://mesalista.pchinojosa.com/', 'MesaLista'),
 ]
-CERT_HOSTS = ['nv-app.pchinojosa.com', 'api.pulseticket.es']
+CERT_HOSTS = ['nv-app.pchinojosa.com', 'api.pulseticket.es', 'backend-restaurant.pchinojosa.com']
 AGENT_HEARTBEAT = 'https://nv-app.pchinojosa.com/storage/monitor/agent.json'
 AGENT_MAX_AGE = 20 * 60
 CERT_MIN_DAYS = 14
